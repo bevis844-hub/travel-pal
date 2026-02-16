@@ -13,6 +13,7 @@ import CurrencyConverter from '../components/CurrencyConverter'
 import PhotoAlbum from '../components/PhotoAlbum'
 import BudgetTracker from '../components/BudgetTracker'
 import AIChatAssistant from '../components/AIChatAssistant'
+import MapView from '../components/MapView'
 
 export default function TripDetail() {
   const { tripId } = useParams()
@@ -117,6 +118,16 @@ export default function TripDetail() {
         <AIChatAssistant 
           destination={trip.destination}
         />
+
+        {/* Map View */}
+        <div className="mt-4">
+          <MapView 
+            destination={trip.destination}
+            locations={[]}
+            startDate={trip.startDate}
+            endDate={trip.endDate}
+          />
+        </div>
       </div>
 
       {/* Tabs */}
