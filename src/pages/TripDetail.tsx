@@ -14,6 +14,7 @@ import PhotoAlbum from '../components/PhotoAlbum'
 import BudgetTracker from '../components/BudgetTracker'
 import AIChatAssistant from '../components/AIChatAssistant'
 import MapView from '../components/MapView'
+import FlightTracker from '../components/FlightTracker'
 
 export default function TripDetail() {
   const { tripId } = useParams()
@@ -127,6 +128,11 @@ export default function TripDetail() {
             startDate={trip.startDate}
             endDate={trip.endDate}
           />
+        </div>
+
+        {/* Flight Tracker */}
+        <div className="mt-4">
+          <FlightTracker />
         </div>
       </div>
 
