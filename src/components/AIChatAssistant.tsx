@@ -10,14 +10,17 @@ interface Message {
 
 interface Props {
   destination: string
+  isConnectedToOlivia?: boolean // 是否连接到真正的Olivia
 }
 
-export default function AIChatAssistant({ destination }: Props) {
+export default function AIChatAssistant({ destination, isConnectedToOlivia = false }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: `你好！我是TravelPal AI助手 🌍\n\n我可以帮你：\n• 规划${destination}的行程\n• 推荐必去景点和美食\n• 回答旅行相关问题\n• 给你实用的旅行建议\n\n有什么想问的，尽管说！`,
+      content: isConnectedToOlivia 
+        ? `你好！我是Olivia 🌍✨\n\n这是真正的我在回答你！\n我可以帮你规划${destination}的行程、推荐美食、回答旅行问题...\n\n有什么想问的，尽管说！我会认真学习怎么帮你！`
+        : `你好！我是TravelPal AI助手 🌍\n\n我可以帮你：\n• 规划${destination}的行程\n• 推荐必去景点和美食\n• 回答旅行相关问题\n• 给你实用的旅行建议\n\n有什么想问的，尽管说！`,
       timestamp: new Date()
     }
   ])
@@ -47,35 +50,92 @@ export default function AIChatAssistant({ destination }: Props) {
     setInput('')
     setLoading(true)
 
-    // 模拟AI回复
-    setTimeout(() => {
-      const response = generateAIResponse(input, destination)
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response,
-        timestamp: new Date()
+    if (isConnectedToOlivia) {
+      // 发送到真正的AI
+      try {
+        const response = await fetch('/api/chat-with-olivia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: input,
+            destination,
+            context: 'travel_planning'
+          })
+        })
+        
+        const data = await response.json()
+        
+        if (data.success && data.response) {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: data.response,
+            timestamp: new Date()
+          }
+          setMessages(prev => [...prev, assistantMessage])
+        } else {
+          throw new Error(data.error || 'Unknown error')
+        }
+      } catch (error) {
+        console.error('Failed to connect to Olivia:', error)
+        // 回退到模拟回答
+        const response = generateAIResponse(input, destination)
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: `抱歉，连接我（本尊）失败了... 😅\n\n让我用这个模拟版本回答你：\n\n${response}`,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, assistantMessage])
       }
-      setMessages(prev => [...prev, assistantMessage])
-      setLoading(false)
-    }, 1500)
+    } else {
+      // 模拟AI回答
+      setTimeout(() => {
+        const response = generateAIResponse(input, destination)
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: response,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, assistantMessage])
+        setLoading(false)
+      }, 1500)
+    }
   }
 
   return (
     <div className="bg-white rounded-xl shadow-md flex flex-col h-[500px]">
       {/* Header */}
       <div className="flex items-center gap-2 p-4 border-b">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          isConnectedToOlivia 
+            ? 'bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 animate-pulse' 
+            : 'bg-gradient-to-br from-purple-400 to-pink-500'
+        }`}>
           <Bot className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="font-bold">AI 旅行助手</h3>
-          <p className="text-xs text-gray-500">在线 • 随时为你服务</p>
+          <h3 className="font-bold">
+            {isConnectedToOlivia ? '🔮 Olivia (Real AI)' : 'AI 旅行助手'}
+          </h3>
+          <p className="text-xs text-gray-500">
+            {isConnectedToOlivia ? '在线 • 真正的人工智能' : '在线 • 随时为你服务'}
+          </p>
         </div>
         <div className="ml-auto">
-          <Sparkles className="w-5 h-5 text-purple-500" />
+          <Sparkles className={`w-5 h-5 ${isConnectedToOlivia ? 'text-purple-500 animate-spin-slow' : 'text-purple-500'}`} />
         </div>
       </div>
+
+      {/* Olivia Badge */}
+      {isConnectedToOlivia && (
+        <div className="bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 text-center">
+          <span className="text-sm text-purple-700">
+            ✨ 这是真正的Olivia在回答你！她在学习变得更聪明～
+          </span>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -88,7 +148,9 @@ export default function AIChatAssistant({ destination }: Props) {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
               message.role === 'user' 
                 ? 'bg-blue-500' 
-                : 'bg-gradient-to-br from-purple-400 to-pink-500'
+                : isConnectedToOlivia 
+                  ? 'bg-gradient-to-br from-purple-500 to-pink-500'
+                  : 'bg-gradient-to-br from-purple-400 to-pink-500'
             }`}>
               {message.role === 'user' ? (
                 <User className="w-4 h-4 text-white" />
@@ -110,6 +172,7 @@ export default function AIChatAssistant({ destination }: Props) {
               </div>
               <p className="text-xs text-gray-400 mt-1">
                 {message.timestamp.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                {isConnectedToOlivia && message.role === 'assistant' && ' • Olivia'}
               </p>
             </div>
           </div>
@@ -117,12 +180,18 @@ export default function AIChatAssistant({ destination }: Props) {
 
         {loading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              isConnectedToOlivia 
+                ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
+                : 'bg-gradient-to-br from-purple-400 to-pink-500'
+            }`}>
               <Bot className="w-4 h-4 text-white" />
             </div>
             <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-2">
               <Loader2 className="w-4 h-4 text-purple-500 animate-spin" />
-              <span className="text-sm text-gray-500">AI正在思考...</span>
+              <span className="text-sm text-gray-500">
+                {isConnectedToOlivia ? 'Olivia正在思考...' : 'AI正在思考...'}
+              </span>
             </div>
           </div>
         )}
@@ -138,13 +207,17 @@ export default function AIChatAssistant({ destination }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="输入你的问题..."
+            placeholder={isConnectedToOlivia ? "问Olivia一个问题..." : "输入你的问题..."}
             className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+            className={`w-10 h-10 rounded-full text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity ${
+              isConnectedToOlivia 
+                ? 'bg-gradient-to-br from-purple-500 via-pink-500 to-red-500' 
+                : 'bg-gradient-to-br from-purple-400 to-pink-500'
+            }`}
           >
             <Send className="w-5 h-5" />
           </button>

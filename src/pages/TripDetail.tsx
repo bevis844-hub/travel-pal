@@ -16,11 +16,20 @@ import AIChatAssistant from '../components/AIChatAssistant'
 import MapView from '../components/MapView'
 import FlightTracker from '../components/FlightTracker'
 
+// 检测是否开启"真AI模式"
+function isOliviaMode(): boolean {
+  if (typeof window !== 'undefined') {
+    return new URLSearchParams(window.location.search).get('olivia') === '1'
+  }
+  return false
+}
+
 export default function TripDetail() {
   const { tripId } = useParams()
   const { trips, addPhoto, deletePhoto } = useTravelStore()
   const trip = trips.find(t => t.id === tripId)
   const [activeTab, setActiveTab] = useState(0)
+  const oliviaMode = isOliviaMode()
 
   if (!trip) {
     return (
@@ -118,6 +127,7 @@ export default function TripDetail() {
         {/* AI Chat Assistant */}
         <AIChatAssistant 
           destination={trip.destination}
+          isConnectedToOlivia={oliviaMode}
         />
 
         {/* Map View */}
