@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { DollarSign, TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react'
+
+
 
 interface BudgetData {
   total: number
@@ -17,13 +17,9 @@ interface BudgetData {
 interface Props {
   budget: BudgetData
   currency: string
-  onUpdate?: (categories: BudgetData['categories']) => void
 }
 
-export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [tempCategories, setTempCategories] = useState(budget.categories)
-
+export default function BudgetTracker({ budget, currency }: Props) {
   const percentage = Math.round((budget.spent / budget.total) * 100)
   
   const getStatusColor = () => {
@@ -38,7 +34,7 @@ export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
     return 'bg-red-500'
   }
 
-  const categoryLabels = {
+  const categoryLabels: Record<string, string> = {
     accommodation: '🏨 住宿',
     transport: '✈️ 交通',
     food: '🍜 美食',
@@ -49,12 +45,7 @@ export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
 
   const formatCurrency = (amount: number) => {
     const symbols: Record<string, string> = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      JPY: '¥',
-      TWD: 'NT$',
-      CNY: '¥'
+      USD: '$', EUR: '€', GBP: '£', JPY: '¥', TWD: 'NT$', CNY: '¥'
     }
     return `${symbols[currency] || '$'}${amount.toLocaleString()}`
   }
@@ -63,15 +54,8 @@ export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
     <div className="bg-white rounded-xl shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-bold text-lg">💰 预算追踪</h3>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="text-sm text-blue-500 hover:text-blue-600"
-        >
-          {isEditing ? '完成' : '编辑'}
-        </button>
       </div>
 
-      {/* 总体进度 */}
       <div className="mb-6">
         <div className="flex justify-between text-sm mb-2">
           <span className="text-gray-500">已花费</span>
@@ -102,12 +86,11 @@ export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
         </div>
       </div>
 
-      {/* 分类明细 */}
       <div className="space-y-3">
         {Object.entries(budget.categories).map(([key, value]) => (
           <div key={key}>
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-gray-600">{categoryLabels[key as keyof typeof categoryLabels]}</span>
+              <span className="text-gray-600">{categoryLabels[key]}</span>
               <span className="font-medium">{formatCurrency(value)}</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -120,11 +103,6 @@ export default function BudgetTracker({ budget, currency, onUpdate }: Props) {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* 提示 */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-blue-600">
-        💡 提示：根据你的{currency}预算，建议每天花费不超过 {formatCurrency(Math.round(budget.total / 7))}
       </div>
     </div>
   )

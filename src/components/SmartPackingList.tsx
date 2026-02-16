@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react'
-import { Sparkles, CheckCircle, Circle, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Sparkles, Plus } from 'lucide-react'
 import { useTravelStore } from '../stores/travelStore'
-import { v4 as uuidv4 } from 'uuid'
 
 interface Props {
-  tripId: string
   destination: string
   days: number
 }
 
-export default function SmartPackingList({ tripId, destination, days }: Props) {
-  const { userPreferences, addTrip } = useTravelStore()
+export default function SmartPackingList({ destination, days }: Props) {
+  const { userPreferences } = useTravelStore()
   const [isGenerating, setIsGenerating] = useState(false)
   const [newItem, setNewItem] = useState('')
 
@@ -50,7 +48,6 @@ export default function SmartPackingList({ tripId, destination, days }: Props) {
       }
 
       // 根据旅行天数调整数量
-      const multiplier = Math.ceil(days / 3)
       
       // 获取当前trip
       // 这里简化处理，实际应该更新trip的packingList

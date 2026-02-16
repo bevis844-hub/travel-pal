@@ -4,10 +4,9 @@ import { useTravelStore } from '../stores/travelStore'
 
 interface Props {
   destination: string
-  days: number
 }
 
-export default function AIRecommendation({ destination, days }: Props) {
+export default function AIRecommendation({ destination }: Props) {
   const { userPreferences } = useTravelStore()
   const [recommendations, setRecommendations] = useState<string[]>([])
   const [loading, setLoading] = useState(false)

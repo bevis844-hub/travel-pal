@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Calendar, MapPin, Users, Share2, Settings } from 'lucide-react'
+import { ArrowLeft, Calendar, MapPin, Share2, Settings } from 'lucide-react'
 import { useTravelStore } from '../stores/travelStore'
 import { format, differenceInDays } from 'date-fns'
 import ItineraryDay from '../components/ItineraryDay'
@@ -95,7 +95,6 @@ export default function TripDetail() {
         {/* AI Recommendation */}
         <AIRecommendation 
           destination={trip.destination} 
-          days={days} 
         />
         
         {/* Weather Widget */}
@@ -135,7 +134,6 @@ export default function TripDetail() {
       {/* Smart Packing */}
       <div className="px-4 mt-6">
         <SmartPackingList 
-          tripId={trip.id}
           destination={trip.destination}
           days={days}
         />

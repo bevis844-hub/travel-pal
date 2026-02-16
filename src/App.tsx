@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import { useTravelStore } from './stores/travelStore'
+
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import TripDetail from './pages/TripDetail'
@@ -8,8 +8,6 @@ import Profile from './pages/Profile'
 import NotFound from './pages/NotFound'
 
 function App() {
-  const { currentUser } = useTravelStore()
-
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

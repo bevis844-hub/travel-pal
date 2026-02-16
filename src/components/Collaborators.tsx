@@ -1,5 +1,5 @@
 import { Collaborator } from '../stores/travelStore'
-import { UserPlus, Crown } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 
 interface Props {
   collaborators: Collaborator[]
@@ -8,7 +8,6 @@ interface Props {
 export default function Collaborators({ collaborators }: Props) {
   return (
     <div className="flex items-center gap-2 mt-4">
-      {/* Avatars */}
       <div className="flex -space-x-2">
         {collaborators.slice(0, 3).map((collab) => (
           <div
@@ -26,7 +25,6 @@ export default function Collaborators({ collaborators }: Props) {
         )}
       </div>
 
-      {/* Add Button */}
       <button className="flex items-center gap-1 text-sm text-blue-500">
         <UserPlus className="w-4 h-4" />
         <span>邀请</span>

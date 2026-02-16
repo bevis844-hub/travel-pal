@@ -2,7 +2,6 @@ import { Trip } from '../stores/travelStore'
 import { format } from 'date-fns'
 import { ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 interface Props {
   trip: Trip

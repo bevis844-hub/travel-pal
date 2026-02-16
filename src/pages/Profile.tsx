@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { User, Mail, MapPin, Heart, Settings, Bell, Shield, HelpCircle } from 'lucide-react'
+import { Heart, Settings, Bell, Shield, HelpCircle, MapPin } from 'lucide-react'
 import { useTravelStore } from '../stores/travelStore'
 
 export default function Profile() {
-  const { currentUser, userPreferences, setUserPreferences } = useTravelStore()
+  const { currentUser, userPreferences } = useTravelStore()
   const [isEditing, setIsEditing] = useState(false)
 
   const menuItems = [

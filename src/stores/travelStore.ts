@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 // 用户偏好类型
-interface UserPreferences {
+export interface UserPreferences {
   travelStyle: 'adventure' | 'relaxation' | 'cultural' | 'foodie' | 'mixed'
   accommodation: 'budget' | 'mid-range' | 'luxury'
   transport: 'flight' | 'train' | 'road-trip' | 'mixed'
@@ -11,7 +11,7 @@ interface UserPreferences {
 }
 
 // 旅行类型
-interface Trip {
+export interface Trip {
   id: string
   name: string
   destination: string
@@ -29,7 +29,7 @@ interface Trip {
 }
 
 // 协作者
-interface Collaborator {
+export interface Collaborator {
   userId: string
   email: string
   name?: string
@@ -39,7 +39,7 @@ interface Collaborator {
 }
 
 // 预算
-interface Budget {
+export interface Budget {
   total: number
   currency: string
   spent: number
@@ -54,13 +54,13 @@ interface Budget {
 }
 
 // 每日行程
-interface ItineraryDay {
+export interface ItineraryDay {
   date: string
   activities: Activity[]
 }
 
 // 活动
-interface Activity {
+export interface Activity {
   id: string
   time: string
   title: string
@@ -72,32 +72,41 @@ interface Activity {
 }
 
 // 行李清单
-interface PackingItem {
+export interface PackingItem {
   id: string
   name: string
   category: 'clothing' | 'electronics' | 'toiletries' | 'documents' | 'medicine' | 'other'
   quantity: number
   packed: boolean
-  assignee?: string // 谁负责带
+  assignee?: string
+}
+
+// 用户
+export interface User {
+  id: string
+  email: string
+  name?: string
+  avatar?: string
+  createdAt: string
+}
+
+// 通知
+export interface Notification {
+  id: string
+  type: 'invite' | 'update' | 'reminder'
+  message: string
+  read: boolean
+  createdAt: string
 }
 
 // App状态
 interface TravelAppState {
-  // 用户信息
   currentUser: User | null
   userPreferences: UserPreferences | null
-  
-  // 旅行
   trips: Trip[]
   currentTrip: Trip | null
-  
-  // 邀请
   pendingInvites: string[]
-  
-  // 通知
   notifications: Notification[]
-  
-  // Actions
   setCurrentUser: (user: User | null) => void
   setUserPreferences: (prefs: UserPreferences) => void
   addTrip: (trip: Trip) => void
@@ -110,45 +119,18 @@ interface TravelAppState {
   togglePacked: (tripId: string, itemId: string) => void
 }
 
-// 用户
-interface User {
-  id: string
-  email: string
-  name?: string
-  avatar?: string
-  createdAt: string
-}
-
-// 通知
-interface Notification {
-  id: string
-  type: 'invite' | 'update' | 'reminder'
-  message: string
-  read: boolean
-  createdAt: string
-}
-
-// 创建Store
 export const useTravelStore = create<TravelAppState>()(
   persist(
     (set) => ({
-      // 初始状态
       currentUser: null,
       userPreferences: null,
       trips: [],
       currentTrip: null,
       pendingInvites: [],
       notifications: [],
-      
-      // Actions
       setCurrentUser: (user) => set({ currentUser: user }),
-      
       setUserPreferences: (prefs) => set({ userPreferences: prefs }),
-      
-      addTrip: (trip) => set((state) => ({ 
-        trips: [...state.trips, trip] 
-      })),
-      
+      addTrip: (trip) => set((state) => ({ trips: [...state.trips, trip] })),
       updateTrip: (tripId, updates) => set((state) => ({
         trips: state.trips.map((trip) =>
           trip.id === tripId ? { ...trip, ...updates } : trip
@@ -157,14 +139,11 @@ export const useTravelStore = create<TravelAppState>()(
           ? { ...state.currentTrip, ...updates }
           : state.currentTrip
       })),
-      
       deleteTrip: (tripId) => set((state) => ({
         trips: state.trips.filter((trip) => trip.id !== tripId),
         currentTrip: state.currentTrip?.id === tripId ? null : state.currentTrip
       })),
-      
       setCurrentTrip: (trip) => set({ currentTrip: trip }),
-      
       addCollaborator: (tripId, collaborator) => set((state) => ({
         trips: state.trips.map((trip) =>
           trip.id === tripId
@@ -172,7 +151,6 @@ export const useTravelStore = create<TravelAppState>()(
             : trip
         )
       })),
-      
       removeCollaborator: (tripId, userId) => set((state) => ({
         trips: state.trips.map((trip) =>
           trip.id === tripId
@@ -183,7 +161,6 @@ export const useTravelStore = create<TravelAppState>()(
             : trip
         )
       })),
-      
       addActivity: (tripId, dayIndex, activity) => set((state) => ({
         trips: state.trips.map((trip) =>
           trip.id === tripId
@@ -198,7 +175,6 @@ export const useTravelStore = create<TravelAppState>()(
             : trip
         )
       })),
-      
       togglePacked: (tripId, itemId) => set((state) => ({
         trips: state.trips.map((trip) =>
           trip.id === tripId

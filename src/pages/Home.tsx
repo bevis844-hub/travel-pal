@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Plus, MapPin, Calendar, Users, Search, Filter } from 'lucide-react'
+import { Plus, Search, Filter } from 'lucide-react'
 import { useTravelStore } from '../stores/travelStore'
 import TripCard from '../components/TripCard'
 import CreateTripModal from '../components/CreateTripModal'
