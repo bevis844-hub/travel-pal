@@ -8,6 +8,7 @@ import Collaborators from '../components/Collaborators'
 import AIRecommendation from '../components/AIRecommendation'
 import WeatherWidget from '../components/WeatherWidget'
 import SmartPackingList from '../components/SmartPackingList'
+import CurrencyConverter from '../components/CurrencyConverter'
 
 export default function TripDetail() {
   const { tripId } = useParams()
@@ -103,6 +104,9 @@ export default function TripDetail() {
           startDate={trip.startDate}
           endDate={trip.endDate}
         />
+
+        {/* Currency Converter */}
+        <CurrencyConverter />
       </div>
 
       {/* Tabs */}
