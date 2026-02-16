@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar, MapPin, Share2, Settings } from 'lucide-react'
 import { useTravelStore } from '../stores/travelStore'
@@ -9,11 +10,14 @@ import AIRecommendation from '../components/AIRecommendation'
 import WeatherWidget from '../components/WeatherWidget'
 import SmartPackingList from '../components/SmartPackingList'
 import CurrencyConverter from '../components/CurrencyConverter'
+import PhotoAlbum from '../components/PhotoAlbum'
+import BudgetTracker from '../components/BudgetTracker'
 
 export default function TripDetail() {
   const { tripId } = useParams()
-  const { trips } = useTravelStore()
+  const { trips, addPhoto, deletePhoto } = useTravelStore()
   const trip = trips.find(t => t.id === tripId)
+  const [activeTab, setActiveTab] = useState(0)
 
   if (!trip) {
     return (
@@ -115,8 +119,9 @@ export default function TripDetail() {
           {['行程', '清单', '预算', '照片'].map((tab, idx) => (
             <button
               key={tab}
+              onClick={() => setActiveTab(idx)}
               className={`px-4 py-2 rounded-full whitespace-nowrap ${
-                idx === 0 ? 'bg-blue-500 text-white' : 'bg-white text-gray-600'
+                activeTab === idx ? 'bg-blue-500 text-white' : 'bg-white text-gray-600'
               }`}
             >
               {tab}
@@ -125,22 +130,36 @@ export default function TripDetail() {
         </div>
       </div>
 
-      {/* Itinerary */}
+      {/* Tab Content */}
       <div className="px-4 mt-4">
-        <ItineraryDay trip={trip} />
-      </div>
-
-      {/* Packing List */}
-      <div className="px-4 mt-6">
-        <PackingList trip={trip} />
-      </div>
-
-      {/* Smart Packing */}
-      <div className="px-4 mt-6">
-        <SmartPackingList 
-          destination={trip.destination}
-          days={days}
-        />
+        {activeTab === 0 && <ItineraryDay trip={trip} />}
+        
+        {activeTab === 1 && (
+          <>
+            <PackingList trip={trip} />
+            <div className="mt-4">
+              <SmartPackingList 
+                destination={trip.destination}
+                days={days}
+              />
+            </div>
+          </>
+        )}
+        
+        {activeTab === 2 && (
+          <div className="space-y-4">
+            <BudgetTracker budget={trip.budget || { total: 0, spent: 0, categories: { accommodation: 0, transport: 0, food: 0, activities: 0, shopping: 0, other: 0 }}} currency="USD" />
+            <CurrencyConverter />
+          </div>
+        )}
+        
+        {activeTab === 3 && (
+          <PhotoAlbum 
+            photos={trip.photos || []}
+            onAddPhoto={(photo) => addPhoto(trip.id, photo)}
+            onDeletePhoto={(photoId) => deletePhoto(trip.id, photoId)}
+          />
+        )}
       </div>
     </div>
   )

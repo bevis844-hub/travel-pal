@@ -80,6 +80,7 @@ export default function CreateTripModal({ onClose }: Props) {
       } : undefined,
       itinerary: days,
       packingList: [],
+      photos: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }

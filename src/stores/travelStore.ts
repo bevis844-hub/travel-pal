@@ -24,8 +24,18 @@ export interface Trip {
   budget?: Budget
   itinerary: ItineraryDay[]
   packingList: PackingItem[]
+  photos: Photo[]
   createdAt: string
   updatedAt: string
+}
+
+// 照片
+export interface Photo {
+  id: string
+  url: string
+  caption: string
+  date: string
+  location?: string
 }
 
 // 协作者
@@ -117,6 +127,8 @@ interface TravelAppState {
   removeCollaborator: (tripId: string, userId: string) => void
   addActivity: (tripId: string, dayIndex: number, activity: Activity) => void
   togglePacked: (tripId: string, itemId: string) => void
+  addPhoto: (tripId: string, photo: Photo) => void
+  deletePhoto: (tripId: string, photoId: string) => void
 }
 
 export const useTravelStore = create<TravelAppState>()(
@@ -184,6 +196,20 @@ export const useTravelStore = create<TravelAppState>()(
                   item.id === itemId ? { ...item, packed: !item.packed } : item
                 )
               }
+            : trip
+        )
+      })),
+      addPhoto: (tripId, photo) => set((state) => ({
+        trips: state.trips.map((trip) =>
+          trip.id === tripId
+            ? { ...trip, photos: [...trip.photos, photo] }
+            : trip
+        )
+      })),
+      deletePhoto: (tripId, photoId) => set((state) => ({
+        trips: state.trips.map((trip) =>
+          trip.id === tripId
+            ? { ...trip, photos: trip.photos.filter(p => p.id !== photoId) }
             : trip
         )
       }))
