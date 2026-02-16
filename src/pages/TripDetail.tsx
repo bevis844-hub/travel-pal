@@ -12,6 +12,7 @@ import SmartPackingList from '../components/SmartPackingList'
 import CurrencyConverter from '../components/CurrencyConverter'
 import PhotoAlbum from '../components/PhotoAlbum'
 import BudgetTracker from '../components/BudgetTracker'
+import AIChatAssistant from '../components/AIChatAssistant'
 
 export default function TripDetail() {
   const { tripId } = useParams()
@@ -111,6 +112,11 @@ export default function TripDetail() {
 
         {/* Currency Converter */}
         <CurrencyConverter />
+
+        {/* AI Chat Assistant */}
+        <AIChatAssistant 
+          destination={trip.destination}
+        />
       </div>
 
       {/* Tabs */}
